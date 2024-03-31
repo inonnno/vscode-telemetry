@@ -29,6 +29,7 @@ export interface ExporterArgs {
    * Environment variables to pass to the http endpoint (optional for remote exporter)
    */
   env?: Object
+  websocketurl?: string
 }
 
 export interface Exporter {
@@ -76,4 +77,5 @@ export interface EventData {
   rangeend_character: string
   documentContent?: string
   documentLanguageId: string
+  hash: string
 }

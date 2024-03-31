@@ -1,6 +1,7 @@
 import * as vscode from 'vscode'
 import { EventData, Exporter } from './types'
 import { publishEvent } from './exporters'
+import * as CryptoJS from 'crypto-js'
 
 let nextId = 1
 let uri2Id: { [key: string]: number } = {}
@@ -21,6 +22,7 @@ export class DocumentOpenEventProducer {
       const id = updateAndGetId(document.uri.toString())
       const rangestart = new vscode.Position(0, 0)
       const rangeend = new vscode.Position(0, 0)
+      const hash = CryptoJS.SHA256(document.getText()).toString()
 
       const event: EventData = {
         eventName: DocumentOpenEventProducer.id,
@@ -38,6 +40,7 @@ export class DocumentOpenEventProducer {
         rangestart_character: rangestart.character.toString(),
         rangeend_line: rangeend.line.toString(),
         rangeend_character: rangeend.character.toString(),
+        hash: hash,
       }
 
       if (
@@ -73,6 +76,7 @@ export class DocumentChangeEventProducer {
           const id = updateAndGetId(e.document.uri.toString())
           const changes = e.contentChanges[0]
           let operation = ''
+          const hash = CryptoJS.SHA256(e.document.getText()).toString()
           if (changes && changes.hasOwnProperty('text')) {
             const { text, range, rangeOffset, rangeLength } = changes
             const rangestart = range.start
@@ -105,6 +109,7 @@ export class DocumentChangeEventProducer {
                 rangestart_character: rangestart.character.toString(),
                 rangeend_line: rangeend.line.toString(),
                 rangeend_character: rangeend.character.toString(),
+                hash: hash,
               }
               if (
                 exporter.activeEvents?.find(
@@ -138,6 +143,7 @@ export class DocumentCloseEventProducer {
           const id = updateAndGetId(document.uri.toString())
           const rangestart = new vscode.Position(0, 0)
           const rangeend = new vscode.Position(0, 0)
+          const hash = '0'
           const event: EventData = {
             eventName: DocumentCloseEventProducer.id,
             eventTime: Date.now(),
@@ -154,6 +160,7 @@ export class DocumentCloseEventProducer {
             rangestart_character: rangestart.character.toString(),
             rangeend_line: rangeend.line.toString(),
             rangeend_character: rangeend.character.toString(),
+            hash: hash,
           }
           if (
             exporter.activeEvents?.find(
@@ -185,6 +192,7 @@ export class DocumentSaveEventProducer {
           const id = updateAndGetId(document.uri.toString())
           const rangestart = new vscode.Position(0, 0)
           const rangeend = new vscode.Position(0, 0)
+          const hash = CryptoJS.SHA256(document.getText()).toString()
           const event: EventData = {
             eventName: DocumentSaveEventProducer.id,
             eventTime: Date.now(),
@@ -201,6 +209,7 @@ export class DocumentSaveEventProducer {
             rangestart_character: rangestart.character.toString(),
             rangeend_line: rangeend.line.toString(),
             rangeend_character: rangeend.character.toString(),
+            hash: hash,
           }
           if (
             exporter.activeEvents?.find(

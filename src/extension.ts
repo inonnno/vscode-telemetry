@@ -42,7 +42,7 @@ export function activate(context: vscode.ExtensionContext) {
   vscode.env.onDidChangeTelemetryEnabled((e: boolean) =>
     e
       ? vscode.window.showInformationMessage(
-          `Telemetry data is being logged to ${exporterIds?.join(' & ')}.`
+          `Telemetry extension is installed.`
         )
       : vscode.window.showInformationMessage('Telemetry extension is disabled.')
   )

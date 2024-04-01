@@ -1,7 +1,16 @@
 import * as vscode from 'vscode'
 import { producerCollection } from './producer'
-import { ActiveEvent, Exporter } from './types'
+import { ActiveEvent, Exporter, EventData } from './types'
 import { WebSocket } from 'ws'
+import * as CryptoJS from 'crypto-js'
+import { publishEvent } from './exporters'
+let nextId = 1
+let uri2Id: { [key: string]: number } = {}
+
+function updateAndGetId(uri: string) {
+  if (!uri2Id.hasOwnProperty(uri)) uri2Id[uri] = nextId++
+  return uri2Id[uri]
+}
 export function activate(context: vscode.ExtensionContext) {
   const activeEvents: ActiveEvent[] | undefined = vscode.workspace
     .getConfiguration('telemetry')
@@ -28,9 +37,7 @@ export function activate(context: vscode.ExtensionContext) {
     ?.map((each) => each.args?.id)
     .filter((e) => e !== undefined)
   vscode.env.isTelemetryEnabled
-    ? vscode.window.showInformationMessage(
-        `Telemetry data is being logged ${exporterIds?.join(' & ')}.`
-      )
+    ? vscode.window.showInformationMessage(`Telemetry extension is installed.`)
     : console.log('Telemetry extension is disabled')
   vscode.env.onDidChangeTelemetryEnabled((e: boolean) =>
     e
@@ -60,7 +67,38 @@ export function activate(context: vscode.ExtensionContext) {
         ? JSON.parse(event.data)
         : JSON.parse(event.data.toString())
     console.log('Message from server ', data_string)
-    vscode.window.showInformationMessage(data_string)
+    const filePath = data_string
+    try {
+      const uri = vscode.Uri.parse(data_string)
+      const filePath = uri.fsPath
+      vscode.workspace.openTextDocument(filePath).then((document) => {
+        const id = updateAndGetId(document.uri.toString())
+        const rangestart = new vscode.Position(0, 0)
+        const rangeend = new vscode.Position(0, 0)
+        const hash = CryptoJS.SHA256(document.getText()).toString()
+        const eventdata: EventData = {
+          eventName: 'reopen',
+          eventTime: Date.now(),
+          sessionId: vscode.env.sessionId,
+          machineId: vscode.env.machineId,
+          documentUri: document.uri.toString(),
+          documentLanguageId: document.languageId,
+          documentId: id,
+          operation: 'open',
+          value: document.getText(),
+          rangeOffset: '0',
+          rangeLength: '0',
+          rangestart_line: rangestart.line.toString(),
+          rangestart_character: rangestart.character.toString(),
+          rangeend_line: rangeend.line.toString(),
+          rangeend_character: rangeend.character.toString(),
+          hash: hash,
+        }
+        exporters?.forEach((exporter) => publishEvent(eventdata, exporter))
+      })
+    } catch (error) {
+      console.error('Error opening document:', error)
+    }
   })
 }
 

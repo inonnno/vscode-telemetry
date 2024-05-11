@@ -2,7 +2,7 @@
   "name": "telemetry",
   "displayName": "Telemetry",
   "description": "",
-  "version": "0.0.11",
+  "version": "0.0.12",
   "repository": "https://github.com/educational-technology-collective/vscode-telemetry",
   "publisher": "educational-technology-collective",
   "engines": {
@@ -51,6 +51,7 @@
               "type": "remote_exporter",
               "args": {
                 "id": "InfluxDB",
+                "consentlink": "https://www.influxdata.com/legal/privacy-policy/",
                 "url": "https://68ltdi5iij.execute-api.us-east-1.amazonaws.com/influx-vscode",
                 "params": {
                   "influx_bucket": "telemetry_dev",

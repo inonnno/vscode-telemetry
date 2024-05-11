@@ -33,12 +33,35 @@ export function activate(context: vscode.ExtensionContext) {
   // Exporters without specifying the corresponding activeEvents will use the global activeEvents configuration.
   // When the global activeEvents configuration is null, exporters that do not have corresponding activeEvents will be ignored.
 
-  const exporterIds = processedExporters
-    ?.map((each) => each.args?.id)
-    .filter((e) => e !== undefined)
+  // const exporterIds = processedExporters
+  //   ?.map((each) => each.args?.id)
+  //   .filter((e) => e !== undefined)
+  // const consentlinks = processedExporters
+  //   ?.map((each) => each.args?.consentlink)
+  //   .filter((e) => e !== undefined)
+  // vscode.env.isTelemetryEnabled
+  //   ? vscode.window.showInformationMessage(`Telemetry extension is installed.`)
+  //   : console.log('Telemetry extension is disabled')
+  const exporterIds: string[] = []
+  const exporterconsentlinks: string[] = []
+  processedExporters?.forEach((each) => {
+    const id = each.args?.id
+    const consentlink = each.args?.consentlink
+    if (id !== undefined) {
+      exporterIds.push(id)
+      exporterconsentlinks.push(consentlink || 'No consent link provided')
+    }
+  })
+
   vscode.env.isTelemetryEnabled
-    ? vscode.window.showInformationMessage(`Telemetry extension is installed.`)
+    ? vscode.window.showInformationMessage(
+        `Telemetry data is being logged for the following exporters, along with their private policy links:
+      ${exporterIds
+        .map((id, index) => `${id}:${exporterconsentlinks[index]}`)
+        .join('\n')}`
+      )
     : console.log('Telemetry extension is disabled')
+
   vscode.env.onDidChangeTelemetryEnabled((e: boolean) =>
     e
       ? vscode.window.showInformationMessage(

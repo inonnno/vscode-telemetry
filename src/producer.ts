@@ -16,7 +16,11 @@ export class DocumentOpenEventProducer {
 
   listen(context: vscode.ExtensionContext, exporter: Exporter) {
     function documentOpenEventHandler(document: vscode.TextDocument) {
-      if (!vscode.env.isTelemetryEnabled || document.uri.scheme !== 'file') {
+      if (
+        !vscode.env.isTelemetryEnabled ||
+        document.uri.scheme !== 'file' ||
+        document.uri.fsPath.endsWith('.env')
+      ) {
         return
       }
       const id = updateAndGetId(document.uri.toString())
@@ -69,7 +73,8 @@ export class DocumentChangeEventProducer {
         (e: vscode.TextDocumentChangeEvent) => {
           if (
             !vscode.env.isTelemetryEnabled ||
-            e.document.uri.scheme !== 'file'
+            e.document.uri.scheme !== 'file' ||
+            e.document.uri.fsPath.endsWith('.env')
           ) {
             return
           }
@@ -136,7 +141,8 @@ export class DocumentCloseEventProducer {
         (document: vscode.TextDocument) => {
           if (
             !vscode.env.isTelemetryEnabled ||
-            document.uri.scheme !== 'file'
+            document.uri.scheme !== 'file' ||
+            document.uri.fsPath.endsWith('.env')
           ) {
             return
           }
@@ -185,7 +191,8 @@ export class DocumentSaveEventProducer {
         (document: vscode.TextDocument) => {
           if (
             !vscode.env.isTelemetryEnabled ||
-            document.uri.scheme !== 'file'
+            document.uri.scheme !== 'file' ||
+            document.uri.fsPath.endsWith('.env')
           ) {
             return
           }

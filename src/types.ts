@@ -18,6 +18,10 @@ export interface ExporterArgs {
    */
   path?: string
   /**
+   * Consent link (optional for remote exporter)
+   */
+  consentlink?: string
+  /**
    * Http endpoint (required for remote exporter)
    */
   url?: string

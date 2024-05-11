@@ -13,9 +13,12 @@ function updateAndGetId(uri: string) {
 
 export class DocumentOpenEventProducer {
   static id: string = 'DocumentOpenEvent'
-
+  private key: string | undefined
+  constructor(key: string | undefined) {
+    this.key = key
+  }
   listen(context: vscode.ExtensionContext, exporter: Exporter) {
-    function documentOpenEventHandler(document: vscode.TextDocument) {
+    const documentOpenEventHandler = (document: vscode.TextDocument) => {
       if (
         !vscode.env.isTelemetryEnabled ||
         document.uri.scheme !== 'file' ||
@@ -29,6 +32,7 @@ export class DocumentOpenEventProducer {
       const hash = CryptoJS.SHA256(document.getText()).toString()
 
       const event: EventData = {
+        key: this.key,
         eventName: DocumentOpenEventProducer.id,
         eventTime: Date.now(),
         sessionId: vscode.env.sessionId,
@@ -66,7 +70,10 @@ export class DocumentOpenEventProducer {
 
 export class DocumentChangeEventProducer {
   static id = 'DocumentChangeEvent'
-
+  private key: string | undefined
+  constructor(key: string | undefined) {
+    this.key = key
+  }
   listen(context: vscode.ExtensionContext, exporter: Exporter) {
     context.subscriptions.push(
       vscode.workspace.onDidChangeTextDocument(
@@ -99,6 +106,7 @@ export class DocumentChangeEventProducer {
             }
             if (e.contentChanges.length > 0) {
               const event: EventData = {
+                key: this.key,
                 eventName: DocumentChangeEventProducer.id,
                 eventTime: Date.now(),
                 sessionId: vscode.env.sessionId,
@@ -134,7 +142,10 @@ export class DocumentChangeEventProducer {
 
 export class DocumentCloseEventProducer {
   static id = 'DocumentCloseEvent'
-
+  private key: string | undefined
+  constructor(key: string | undefined) {
+    this.key = key
+  }
   listen(context: vscode.ExtensionContext, exporter: Exporter) {
     context.subscriptions.push(
       vscode.workspace.onDidCloseTextDocument(
@@ -151,6 +162,7 @@ export class DocumentCloseEventProducer {
           const rangeend = new vscode.Position(0, 0)
           const hash = '0'
           const event: EventData = {
+            key: this.key,
             eventName: DocumentCloseEventProducer.id,
             eventTime: Date.now(),
             sessionId: vscode.env.sessionId,
@@ -184,7 +196,10 @@ export class DocumentCloseEventProducer {
 
 export class DocumentSaveEventProducer {
   static id = 'DocumentSaveEvent'
-
+  private key: string | undefined
+  constructor(key: string | undefined) {
+    this.key = key
+  }
   listen(context: vscode.ExtensionContext, exporter: Exporter) {
     context.subscriptions.push(
       vscode.workspace.onDidSaveTextDocument(
@@ -201,6 +216,7 @@ export class DocumentSaveEventProducer {
           const rangeend = new vscode.Position(0, 0)
           const hash = CryptoJS.SHA256(document.getText()).toString()
           const event: EventData = {
+            key: this.key,
             eventName: DocumentSaveEventProducer.id,
             eventTime: Date.now(),
             sessionId: vscode.env.sessionId,

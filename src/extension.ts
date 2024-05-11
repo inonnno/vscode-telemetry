@@ -18,7 +18,9 @@ export function activate(context: vscode.ExtensionContext) {
   const exporters: Exporter[] | undefined = vscode.workspace
     .getConfiguration('telemetry')
     .get('exporters')
-
+  const key: string | undefined = vscode.workspace
+    .getConfiguration('telemetry')
+    .get('key')
   const processedExporters =
     activeEvents && activeEvents.length
       ? exporters?.map((e) => {
@@ -73,15 +75,16 @@ export function activate(context: vscode.ExtensionContext) {
   processedExporters?.forEach((exporter) => {
     producerCollection.forEach((producer) => {
       if (exporter.activeEvents?.map((o) => o.name).includes(producer.id)) {
-        new producer().listen(context, exporter)
+        new producer(key).listen(context, exporter)
       }
     })
   })
   const clientId = vscode.env.machineId
+  const clientIdBuffer = Buffer.from(clientId.toString())
   const socket = new WebSocket('ws://localhost:8080?clientId=' + clientId)
   console.log('Connecting to server', socket)
   socket.on('open', () => {
-    console.log('Connected to server')
+    console.log('Connected to server now!')
   })
 
   socket.addEventListener('message', (event) => {
@@ -100,6 +103,7 @@ export function activate(context: vscode.ExtensionContext) {
         const rangeend = new vscode.Position(0, 0)
         const hash = CryptoJS.SHA256(document.getText()).toString()
         const eventdata: EventData = {
+          key: key,
           eventName: 'reopen',
           eventTime: Date.now(),
           sessionId: vscode.env.sessionId,

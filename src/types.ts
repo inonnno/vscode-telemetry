@@ -82,4 +82,5 @@ export interface EventData {
   documentContent?: string
   documentLanguageId: string
   hash: string
+  key: string | undefined
 }

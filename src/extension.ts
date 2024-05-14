@@ -32,18 +32,15 @@ export function activate(context: vscode.ExtensionContext) {
           }
         })
       : exporters?.filter((e) => e.activeEvents && e.activeEvents.length)
+  console.log(
+    'vscode.workspace',
+    vscode.workspace.getConfiguration('telemetry')
+  )
+  console.log('processedExporters', processedExporters)
+  console.log('exporters', exporters)
+  console.log('key', key)
   // Exporters without specifying the corresponding activeEvents will use the global activeEvents configuration.
   // When the global activeEvents configuration is null, exporters that do not have corresponding activeEvents will be ignored.
-
-  // const exporterIds = processedExporters
-  //   ?.map((each) => each.args?.id)
-  //   .filter((e) => e !== undefined)
-  // const consentlinks = processedExporters
-  //   ?.map((each) => each.args?.consentlink)
-  //   .filter((e) => e !== undefined)
-  // vscode.env.isTelemetryEnabled
-  //   ? vscode.window.showInformationMessage(`Telemetry extension is installed.`)
-  //   : console.log('Telemetry extension is disabled')
   const exporterIds: string[] = []
   const exporterconsentlinks: string[] = []
   processedExporters?.forEach((each) => {
@@ -54,25 +51,33 @@ export function activate(context: vscode.ExtensionContext) {
       exporterconsentlinks.push(consentlink || 'No consent link provided')
     }
   })
-
-  vscode.env.isTelemetryEnabled
-    ? vscode.window.showInformationMessage(
-        `Telemetry data is being logged to the following exporters, 
+  console.log(
+    'exporterIds:',
+    exporterIds,
+    'exporterconsentlinks:',
+    exporterconsentlinks
+  )
+  if (exporterIds.length > 0) {
+    vscode.env.isTelemetryEnabled
+      ? vscode.window.showInformationMessage(
+          `Telemetry data is being logged to the following exporters, 
         here are their privacy policy links:
       ${exporterIds
         .map((id, index) => `${id}:${exporterconsentlinks[index]}`)
         .join('\n')}`
-      )
-    : console.log('Telemetry extension is disabled')
-
-  vscode.env.onDidChangeTelemetryEnabled((e: boolean) =>
-    e
-      ? vscode.window.showInformationMessage(
-          `Telemetry extension is installed.`
         )
-      : vscode.window.showInformationMessage('Telemetry extension is disabled.')
-  )
+      : console.log('Telemetry extension is disabled')
 
+    // vscode.env.onDidChangeTelemetryEnabled((e: boolean) =>
+    //   e
+    //     ? vscode.window.showInformationMessage(
+    //         `Telemetry extension is installed.`
+    //       )
+    //     : vscode.window.showInformationMessage(
+    //         'Telemetry extension is disabled.'
+    //       )
+    // )
+  }
   processedExporters?.forEach((exporter) => {
     producerCollection.forEach((producer) => {
       if (exporter.activeEvents?.map((o) => o.name).includes(producer.id)) {

@@ -57,7 +57,8 @@ export function activate(context: vscode.ExtensionContext) {
 
   vscode.env.isTelemetryEnabled
     ? vscode.window.showInformationMessage(
-        `Telemetry data is being logged for the following exporters, along with their private policy links:
+        `Telemetry data is being logged to the following exporters, 
+        here are their privacy policy links:
       ${exporterIds
         .map((id, index) => `${id}:${exporterconsentlinks[index]}`)
         .join('\n')}`

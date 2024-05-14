@@ -1,4 +1,8 @@
 {
+  "editor.autoIndent": "none",
+  "editor.formatOnSave": false,
+  "workbench.editor.enablePreview": false,
+  "telemetry.key": "c0f1b3b0-0b3b-4b3b-8b3b-0b3b0b3b0b3b",
   "telemetry.activeEvents": [
     {
       "name": "DocumentOpenEvent",
@@ -33,6 +37,7 @@
       "args": {
         "id": "S3",
         "url": "https://telemetry.mentoracademy.org/telemetry-edtech-labs-si-umich-edu/dev/test-telemetry",
+        "consentlink": "https://www.influxdata.com/privacy-policy/",
         "env": {
           "WORKSPACE_ID": "dev"
         }
@@ -43,6 +48,7 @@
       "args": {
         "id": "InfluxDB",
         "url": "https://68ltdi5iij.execute-api.us-east-1.amazonaws.com/influx-vscode",
+        "consentlink": "https://www.influxdata.com/privacy-policy/",
         "params": {
           "influx_bucket": "telemetry_dev",
           "influx_measurement": "vscode"
